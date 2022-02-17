@@ -1,27 +1,32 @@
+// get the ID product from URL
+const params = (new URL(document.location)).searchParams;
+let productID = params.get('id');
 
-// request a specific product
-const fetchOneProduct = async(productID) => {
-    // declare an empty object
-    let product = {};
-    try {
-        // make the API call
-        const APIResponse = await fetch(`http://localhost:3000/api/${productID}`, {
-            headers : { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-             }
-        });
-        // get the product object
-        product = await APIResponse.json();
-    } catch (err) {
-        console.error(err);
-    }     
-    return product;
+// Display the current product 
+const displayCurrentProduct = (product) => {
+    product.colors.forEach((color,idx) => {
+        insertStringInDOM("colors", "innerHTML", true,  `<option value="${color}">${color}</option>`);
+    });
+    const toInsertArr = [
+        ["img", "innerHTML", false, `<img src="${product.imageUrl}" alt="${product.altTxt}">`],
+        ["title", "innerText", false,`${product.name}`],
+        ["price", "innerText", false,`${product.price}`],
+        ["description", "innerText", false,`${product.description}`],
+    ];    
+    toInsertArr.forEach(toInsert => {
+        insertStringInDOM(...toInsert);
+    });
 };
 
 // waiting for the full loaded page
 window.addEventListener('DOMContentLoaded', async (event) => {
-    // TODO get product id from 
-    // TODO call API to get the actual product
-    // TODO display product information on the page by manipulating the DOM
+    const product = await fetchOneResource(productID, "products");
+    displayCurrentProduct(product);
 });
+
+const numbers = [1,2,3];
+const test = (...args) => {
+    console.log(...args);
+}
+
+test(numbers)
