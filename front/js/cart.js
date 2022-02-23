@@ -1,10 +1,13 @@
-//  TODO refactor
-// const postOrder = async() => {
-//     // TODO (with method POST) + pass order data to the request
-//     await fetch(`http://localhost:3000/api/products/order`)
-//         .then((res) => res.json())
-//         .then((res) => {
-//             productData = res;
-//             console.log(productData);
-//         });
-// }
+// declare cart as an empty array
+const cart = [];
+
+
+// pushing item in array
+
+// const addItemInArray = cart.push("test")
+
+// console.log(cart)
+
+// ciblling the add to cart button
+// const addButton = document.querySelector("button")
+// addButton.addEventListener('click', console.log("Hey oh ?"))
