@@ -24,7 +24,7 @@ const displayCurrentProduct = (product) => {
 const button = document.getElementById("addToCart")
 
 // create an empty array of product 
-let addToCartProduct = [];
+let newProductsToOrder = [];
 
 // get the select colors item and number of products
 let select = document.getElementById("colors")
@@ -32,9 +32,22 @@ let numberOfProduct = document.getElementById("quantity")
 
 // get all the current product values 
 const addProduct = (product) => {
-    addToCartProduct.push(product, select.value, numberOfProduct.value)
+    const productToOrder = {
+        product: product,
+        chosenColor: select.value,
+        quantity: numberOfProduct.value
+    };
+    newProductsToOrder.push(productToOrder);
+    // get what's existing in the local storage
+    let previousProductsToOrder = localStorage.getItem("products");
+    if (previousProductsToOrder != null) {
+        previousProductsToOrder = JSON.parse(localStorage.getItem("products"));
+    } else {
+        previousProductsToOrder = [];
+    }
+    const productsToOrder = newProductsToOrder.concat(previousProductsToOrder);
     // set the array in the local storage
-    localStorage.setItem("product", JSON.stringify(addToCartProduct))
+    localStorage.setItem("products", JSON.stringify(productsToOrder));
 }
 
 // waiting for the full loaded page

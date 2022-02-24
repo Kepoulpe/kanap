@@ -17,4 +17,5 @@ const productsDisplay = (products) => {
 window.addEventListener('DOMContentLoaded', async (event) => {
     const products = await fetchResources("products");
     productsDisplay(products);
+    console.log(products)
 });
