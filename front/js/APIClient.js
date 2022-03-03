@@ -12,7 +12,6 @@
         });
         // get the obj object
         obj = await APIResponse.json();
-        console.log(obj)
     } catch (err) {
         console.error(err);
     }     

@@ -32,10 +32,13 @@ let numberOfProduct = document.getElementById("quantity")
 
 // get all the current product values 
 const addProduct = (product) => {
+
+    // TODO change object structure of productToOrder ?
     const productToOrder = {
         product: product,
         chosenColor: select.value,
-        quantity: numberOfProduct.value
+        quantity: parseInt(numberOfProduct.value),
+        _id: product._id
     };
     newProductsToOrder.push(productToOrder);
     // get what's existing in the local storage
@@ -45,6 +48,26 @@ const addProduct = (product) => {
     } else {
         previousProductsToOrder = [];
     }
+
+    // 1) get previousProductsToOrder items individually
+    previousProductsToOrder.forEach(product => {
+        // 2) compare id of the iterated product with the one that has been just added
+        if (product._id === productToOrder._id && product.chosenColor === productToOrder.chosenColor) {
+            // 3) we want to add to the previously selected matching product the quantity of the same new one
+            product.quantity = parseInt(product.quantity) + productToOrder.quantity;
+            // 4) we want to remove from the new products to order the matching product
+            newProductsToOrder = newProductsToOrder.map(newProduct => {
+                if (newProduct._id !== product._id) {
+                    return newProduct;
+                } else if (newProduct.chosenColor != product.chosenColor) {
+                    return newProduct;
+                } else {
+                    return null;
+                }
+            }).filter(el => el !== null);
+        }
+    });
+
     const productsToOrder = newProductsToOrder.concat(previousProductsToOrder);
     // set the array in the local storage
     localStorage.setItem("products", JSON.stringify(productsToOrder));
