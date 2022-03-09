@@ -1,27 +1,27 @@
-//get the cart in the local storage
-let products = localStorage.getItem("products");
+ // we get the cart items that may have been previously saved by the user
+ const cartItems = getItemsFromLocalStorage("cartItems");
+console.log(cartItems)
+// display all the items that we previously get form the local storage
 
-// display all the products on the cart page
+const displayItems = (items) => {
 
-const cartProducts = (products) => {
-
-  // TODO factorize this local storage retrieval behavior in one function
-  products = JSON.parse(products);
-  console.log(products);
-   products.forEach(product => {
-    const productToDisplay = `<article class="cart__item" data-id="${product.product._id}" data-color="${product.chosenColor}">
+  // loop in each item dor dynamic display
+   cartItems.forEach(item => {
+     // modify DOM element to create an item card
+    const itemToDisplay = 
+    `<article class="cart__item" data-id="${item._id}" data-color="${item.color}">
     <div class="cart__item__img">
-      <img src="${product.product.imageUrl}" alt="${product.product.altText}">
+      <img src="${item.product.imageUrl}" alt="${item.product.altText}">
     </div>
     <div class="cart__item__content">
       <div class="cart__item__content__description">
-        <h2>${product.product.name}</h2>
-        <p>${product.chosenColor}</p>
-        <p>${product.product.price} €</p>
+        <h2>${item.product.name}</h2>
+        <p>${item.color}</p>
+        <p>${item.product.price} €</p>
       </div>
       <div class="cart__item__content__settings">
         <div class="cart__item__content__settings__quantity">
-          <p>Qté : ${product.quantity} </p>
+          <p>Qté : ${item.quantity} </p>
           <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="">
         </div>
         <div class="cart__item__content__settings__delete">
@@ -30,7 +30,8 @@ const cartProducts = (products) => {
       </div>
     </div>
   </article>`;
-  insertStringInDOM("cart__items","innerHTML", true, productToDisplay)
+  // use the DOMHelper function to insert card in html
+  insertStringInDOM("cart__items","innerHTML", true, itemToDisplay)
   });
 }
 
@@ -51,19 +52,24 @@ const deleteProduct = async (products) => {
   })
   })
 }
-// display total quantity
-const totalQuantity = (products) => {
-  products = JSON.parse(products)
-  const sum = products.quantity;
-  console.log(sum)
-}
+
+// get all the quantity values and add them together
+const sumAll = cartItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
+console.log(sumAll);
+
+//  display sum of values in DOM
+const displayItemsQuantity = document.getElementById("totalQuantity").innerText = sumAll
+
+
+// declare an empty array of Items total price
+let ItemsTotalPrice = [];
+// get all the prices values and multiply them with quantities to had a total price
+
 
  
 
 
 // waiting for the full loaded page
 window.addEventListener('DOMContentLoaded', async (event) => {
-  cartProducts(products)
-  deleteProduct(products)
-  totalQuantity(products)
+  displayItems("items")
 });

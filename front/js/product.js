@@ -1,92 +1,103 @@
-// get the ID product from URL
-const params = (new URL(document.location)).searchParams;
-let productID = params.get('id');
-
-// Display the current product 
-const displayCurrentProduct = (product) => {
-    product.colors.forEach((color,idx) => {
+/**
+ * 
+ * @description takes a product object as a parameter and displays it in the DOM
+ * 
+ * @param {Object} productObj 
+ */
+ const displayProduct = (productObj) => {
+    productObj.colors.forEach((color,idx) => {
         insertStringInDOM("colors", "innerHTML", true,  `<option value="${color}">${color}</option>`);
     });
     const toInsertArr = [
-        ["img", "innerHTML", false, `<img src="${product.imageUrl}" alt="${product.altTxt}">`],
-        ["title", "innerText", false,`${product.name}`],
-        ["price", "innerText", false,`${product.price}`],
-        ["description", "innerText", false,`${product.description}`],
+        ["img", "innerHTML", false, `<img src="${productObj.imageUrl}" alt="${productObj.altTxt}">`],
+        ["title", "innerText", false,`${productObj.name}`],
+        ["price", "innerText", false,`${productObj.price}`],
+        ["description", "innerText", false,`${productObj.description}`],
     ];    
     toInsertArr.forEach(toInsert => {
         insertStringInDOM(...toInsert);
     });
 };
 
-// add product to the cart
+/**
+ * 
+ * @description returns a product id from a URL query param
+ * 
+ * @returns {string}
+ */
+ function getProductIdFromUrl() {
+    return (new URL(document.location)).searchParams.get('id');
+};
 
-// get the add to cart button
-const button = document.getElementById("addToCart")
+/**
+ * 
+ * @description persists a cart item in local storage to be processed in the cart page
+ * 
+ * @param {Object} addedCartItem 
+ */
+function persistCartItem(addedCartItem) {
 
-// create an empty array of product 
-let newProductsToOrder = [];
+    // we generate a unique id for the cart item, made of a product id and the color model
+    const cartItemUID = addedCartItem.product._id + addedCartItem.color;
 
-// get the select colors item and number of products
-let select = document.getElementById("colors")
-let numberOfProduct = document.getElementById("quantity")
+    // we get the cart items that may have been previously saved by the user
+    const cartItems = getItemsFromLocalStorage("cartItems");
 
-// get all the current product values 
-const addProduct = (product) => {
-
-    // TODO change object structure of productToOrder ?
-    const productToOrder = {
-        product: product,
-        chosenColor: select.value,
-        quantity: parseInt(numberOfProduct.value),
-        _id: product._id
-    };
-    newProductsToOrder.push(productToOrder);
-    // get what's existing in the local storage
-    let previousProductsToOrder = localStorage.getItem("products");
-    if (previousProductsToOrder != null) {
-        previousProductsToOrder = JSON.parse(localStorage.getItem("products"));
-    } else {
-        previousProductsToOrder = [];
-    }
-
-    // 1) get previousProductsToOrder items individually
-    previousProductsToOrder.forEach(product => {
-        // 2) compare id of the iterated product with the one that has been just added
-        if (product._id === productToOrder._id && product.chosenColor === productToOrder.chosenColor) {
-            // 3) we want to add to the previously selected matching product the quantity of the same new one
-            product.quantity = parseInt(product.quantity) + productToOrder.quantity;
-            // 4) we want to remove from the new products to order the matching product
-            newProductsToOrder = newProductsToOrder.map(newProduct => {
-                if (newProduct._id !== product._id) {
-                    return newProduct;
-                } else if (newProduct.chosenColor != product.chosenColor) {
-                    return newProduct;
-                } else {
-                    return null;
-                }
-            }).filter(el => el !== null);
+    // we check if an item with the same id and the same color has been previously saved
+    let cartItemHasBeenPreviouslySaved = false;
+    cartItems.forEach(item => {
+        // we compare generated cart item ID's to determine if previously saved
+        if (item.product._id + item.color === cartItemUID) {
+            console.log(item);
+            // if we enter the condition then we can update the item quantity with the one that is being added by the user
+            item.quantity = parseInt(item.quantity) + addedCartItem.quantity;
+            // we now know that the added cart item has been previously saved
+            cartItemHasBeenPreviouslySaved = true;
         }
+        console.log(item);
     });
 
-    const productsToOrder = newProductsToOrder.concat(previousProductsToOrder);
-    // set the array in the local storage
-    localStorage.setItem("products", JSON.stringify(productsToOrder));
+    // we only push the added cart items to the array of cart items if it has not been saved before
+    if (!cartItemHasBeenPreviouslySaved) {
+        cartItems.push(addedCartItem);
+    }
+
+    // we put the cart items back to the local storage
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
 }
 
-// waiting for the full loaded page
-window.addEventListener('DOMContentLoaded', async (event) => {
-    const product = await fetchOneResource(productID, "products");
-    displayCurrentProduct(product);
-    button.addEventListener('click', event => {addProduct(product)})
+
+// code execution
+
+// we wait that all resources are loaded (including scripts) before proceeding
+window.addEventListener('load', async () => {
+    
+    // we fetch a product object with its ID obtained from the current URL
+    const productObj = await fetchOneResource(getProductIdFromUrl(), "products");
+
+    // once we get that product we display it
+    displayProduct(productObj);
+
+    // we get the add to cart button
+    const addToCartBtn = document.getElementById("addToCart");
+
+    // we listen to click events on that add to cart button
+    addToCartBtn.addEventListener("click", () => {
+
+        // we get the color selection and the quantity user input values
+        const colorSelection = document.getElementById("colors").value;
+        const quantityInput = document.getElementById("quantity").value;
+
+        // we add color and quantity data to a cart item object
+        const cartItemObj = {
+            product: productObj,
+            color: colorSelection,
+            quantity: parseInt(quantityInput)
+        }
+
+        // we persist the cart item object
+        persistCartItem(cartItemObj);
+
+    }); // End Of `addToCartBtn` on click event
+
 });
-
-
-
-
-
-// const numbers = [1,2,3];
-// const test = (...args) => {
-//     console.log(...args);
-// }
-
-// test(numbers)
