@@ -1,13 +1,15 @@
+const getUID = (item) => {
+  return item.product._id+item.color;
+}
+
 // display all the items that we previously get form the local storage
 const displayItems = (items) => {
 
   // loop in each item dor dynamic display
    items.forEach(item => {
 
-    console.log(item);
-
      // modify DOM element to create an item card
-    const itemToDisplay = `<article class="cart__item">
+    const itemToDisplay = `<article class="cart__item" id="${getUID(item)}">
       <div class="cart__item__img">
         <img src="${item.product.imageUrl}" alt="${item.product.altText}">
       </div>
@@ -29,68 +31,34 @@ const displayItems = (items) => {
       </div>
     </article>`;
 
-    // we get the delete button
-    
-
-    // we apply a click event on this delete button
-
-    // this click event should trigger a behavior (function) that actually deletes the item
-
-    // use the DOMHelper function to insert card in html
     insertStringInDOM("cart__items","innerHTML", true, itemToDisplay)
   });
 }
 
-// fucntion that will delete an item 
-const deleteItems = async (displayItems) => {
-
-  // waiting for the items display 
-  await displayItems
- 
-  // query all the buttons display dynamicly buy the previous function
-  const deleteButtons = document.querySelectorAll(".deleteItem")
-
-  // loop in the NodeList to get a specific button by clicking on
-  deleteButtons.forEach((button) =>{
-    button.addEventListener("click", (cartItems) => {
-    
-      //compare if data are equals
-      for (i=0; i< cartItems.lenght; i++) {
-
-        if (cartItems[i].product._id ==  button.dataset.id && cartItems[i].color == button.dataset.color) {
-
-          // if data is equal remove this specific item from local storage
-          return localStorage.removeItem(cartItems[i])
-        }
-      }
-    })
-  })
-}
-
 // function that will change the quantity of product
-const editQuantity = async (displayItems) => {
+// const editQuantity = async (displayItems) => {
 
-  // waiting for the items display
-  await displayItems
+//   // waiting for the items display
+//   await displayItems
 
-  // query all the inputs 
-  const inputsQuantity = document.querySelectorAll(".itemQuantity")
-  console.log(inputsQuantity)
+//   // query all the inputs 
+//   const inputsQuantity = document.querySelectorAll(".itemQuantity")
+//   console.log(inputsQuantity)
 
-  // loop in the NodeList to get a specific input  and listen is onchange event
-  inputsQuantity.forEach((input) => {
-    input.addEventListener("change" ,() => {
+//   // loop in the NodeList to get a specific input  and listen is onchange event
+//   inputsQuantity.forEach((input) => {
+//     input.addEventListener("change" ,() => {
       
-      // compare if data are equals
+//       // compare if data are equals
 
-      for(i=[0]; i<cartItems.lenght; i++) {
-        if(cartItems[i].product._id == input.dataset.id && cartItems[i].color == input.dataset.color) {
-          return console.log(input.value)
-        }
-      }
-    })
-  })
-}
+//       for(i=[0]; i<cartItems.lenght; i++) {
+//         if(cartItems[i].product._id == input.dataset.id && cartItems[i].color == input.dataset.color) {
+//           return console.log(input.value)
+//         }
+//       }
+//     })
+//   })
+// }
 
 
 
@@ -116,10 +84,13 @@ const priceItemsSum = (items) => {
 }
 
 // waiting for the full loaded page
-window.addEventListener('DOMContentLoaded', async (event) => {
+window.addEventListener('DOMContentLoaded', (event) => {
 
   // we get the cart items that may have been previously saved by the user
   const cartItems = getItemsFromLocalStorage("cartItems");
+
+  // displaying the cart items on the page
+  displayItems(cartItems);
 
   // display the all prices sum in the DOM
   document.getElementById("totalPrice").innerText = priceItemsSum(cartItems).map(item => item.price).reduce((prev, curr) => prev + curr, 0); 
@@ -128,8 +99,32 @@ window.addEventListener('DOMContentLoaded', async (event) => {
   //  display sum of values in DOM
   document.getElementById("totalQuantity").innerText = cartItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
 
-  displayItems(cartItems);
-  deleteItems(cartItems);
-  editQuantity(cartItems);
-  console.log(cartItems)
+  // query all the buttons display dynamicly buy the previous function
+  const deleteButtons = document.querySelectorAll(".deleteItem");
+
+  // loop in the NodeList to get a specific button by clicking on
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", e => {
+
+      // we get the cart items that may have been previously saved by the user
+      const cartItems = getItemsFromLocalStorage("cartItems");
+
+      const buttonEl = e.target;
+
+      // find the product in items that is equal to the data-id attr of the btn
+      const itemToDelete = cartItems.find(item => getUID(item) === buttonEl.getAttribute("data-id")+buttonEl.getAttribute("data-color"));
+      const newItems = cartItems.filter(item => getUID(item) !== getUID(itemToDelete));
+
+      console.log(newItems);
+
+      // reset local storage with updated values
+      localStorage.removeItem("cartItems");
+      localStorage.setItem("cartItems", JSON.stringify(newItems));
+    
+      // delete deleted item from the DOM
+      document.getElementById(getUID(itemToDelete)).remove();
+
+      // TODO recalculate totals
+    })
+  })
 });

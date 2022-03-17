@@ -1,12 +1,12 @@
 const getItemsFromLocalStorage = (key) => {
     // get what's existing in the local storage
-    let products = localStorage.getItem(key);
-    if (products != null) {
-        products = JSON.parse(products);
+    let items = localStorage.getItem(key);
+    if (items != null) {
+        items = JSON.parse(items);
     } else {
-        products = [];
+        items = [];
     }
-    return products;
+    return items;
 }    
      
         
