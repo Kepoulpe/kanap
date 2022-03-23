@@ -99,7 +99,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   //  display sum of values in DOM
   document.getElementById("totalQuantity").innerText = cartItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
 
-  // query all the buttons display dynamicly buy the previous function
+  // query all the buttons displayed dynamicly by the previous function
   const deleteButtons = document.querySelectorAll(".deleteItem");
 
   // loop in the NodeList to get a specific button by clicking on
@@ -124,7 +124,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
       // delete deleted item from the DOM
       document.getElementById(getUID(itemToDelete)).remove();
 
-      // TODO recalculate totals
+      // recalculate and display totals with the new items values
+
+      document.getElementById("totalPrice").innerText = priceItemsSum(newItems).map(item => item.price).reduce((prev, curr) => prev + curr, 0);
+
+      document.getElementById("totalQuantity").innerText = newItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
+    })
+  })
+
+  // query all the input for quantity displayed dynamicly by the previous function
+  const inputsQuantity = document.querySelectorAll(".itemQuantity");
+
+  // loop in the NodeList to get a specific input when is value is change by the user
+  inputsQuantity.forEach((input)=> {
+    input.addEventListener("change", e => {
+
+      //we get the cart items that may have been previously saved bu the user
+      const cartItems = getItemsFromLocalStorage("cartItems")
+
+      const inputEl = e.target;
+
+      // find the product in items that equal to the data-id attr of the input
+      const itemToUpdateQuantity = cartItems.find(item => getUID(item) === inputEl.getAttribute("data-id")+inputEl.getAttribute("data-color"));
+      const newItems = cartItems.filter(item => getUID(item) !== getUID(itemToUpdateQuantity));
     })
   })
 });
