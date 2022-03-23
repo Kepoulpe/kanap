@@ -1,14 +1,14 @@
 const getUID = (item) => {
-  return item.product._id+item.color;
+  return item.product._id + item.color;
 }
 
 // display all the items that we previously get form the local storage
 const displayItems = (items) => {
 
   // loop in each item dor dynamic display
-   items.forEach(item => {
+  items.forEach(item => {
 
-     // modify DOM element to create an item card
+    // modify DOM element to create an item card
     const itemToDisplay = `<article class="cart__item" id="${getUID(item)}">
       <div class="cart__item__img">
         <img src="${item.product.imageUrl}" alt="${item.product.altText}">
@@ -31,7 +31,7 @@ const displayItems = (items) => {
       </div>
     </article>`;
 
-    insertStringInDOM("cart__items","innerHTML", true, itemToDisplay)
+    insertStringInDOM("cart__items", "innerHTML", true, itemToDisplay)
   });
 }
 
@@ -48,7 +48,7 @@ const displayItems = (items) => {
 //   // loop in the NodeList to get a specific input  and listen is onchange event
 //   inputsQuantity.forEach((input) => {
 //     input.addEventListener("change" ,() => {
-      
+
 //       // compare if data are equals
 
 //       for(i=[0]; i<cartItems.lenght; i++) {
@@ -65,7 +65,7 @@ const displayItems = (items) => {
 // get all the prices values and multiply them with quantities to had a total price
 const priceItemsSum = (items) => {
 
-  return items.map(item => ({price: item.quantity * item.product.price}));
+  return items.map(item => ({ price: item.quantity * item.product.price }));
 
   /**
    *  We can also do like this to display the total products price
@@ -82,6 +82,39 @@ const priceItemsSum = (items) => {
   return itemsTotalPrice;
    */
 }
+// function that will update the chosen item quantity and re display items on the dom
+function updateQuantityitem() {
+  // query all the input for quantity displayed dynamicly by the previous function
+  const inputsQuantity = document.querySelectorAll(".itemQuantity");
+
+  // loop in the NodeList to get a specific input when is value is change by the user
+  inputsQuantity.forEach((input) => {
+    input.addEventListener("change", e => {
+
+      //we get the cart items that may have been previously saved bu the user
+      const cartItems = getItemsFromLocalStorage("cartItems")
+
+      const inputEl = e.target;
+
+      // find the product in items that equal to the data-id attr of the input
+      let cartItemHasBeenPreviouslySaved = false;
+      cartItems.forEach(item => {
+        // we compare generated cart item ID's to determine if previously saved
+        if (getUID(item) === inputEl.getAttribute("data-id") + inputEl.getAttribute("data-color")) {
+          console.log(item);
+          // if we enter the condition then we can update the item quantity with the one that is being added by the user
+          item.quantity = parseInt(inputEl.value);
+          // we now know that the added cart item has been previously saved
+          cartItemHasBeenPreviouslySaved = true;
+        }
+        console.log(item);
+      });
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      displayItems(cartItems)
+    })
+  })
+  
+}
 
 // waiting for the full loaded page
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -93,7 +126,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   displayItems(cartItems);
 
   // display the all prices sum in the DOM
-  document.getElementById("totalPrice").innerText = priceItemsSum(cartItems).map(item => item.price).reduce((prev, curr) => prev + curr, 0); 
+  document.getElementById("totalPrice").innerText = priceItemsSum(cartItems).map(item => item.price).reduce((prev, curr) => prev + curr, 0);
 
   // get all the quantity values and add them together
   //  display sum of values in DOM
@@ -112,7 +145,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const buttonEl = e.target;
 
       // find the product in items that is equal to the data-id attr of the btn
-      const itemToDelete = cartItems.find(item => getUID(item) === buttonEl.getAttribute("data-id")+buttonEl.getAttribute("data-color"));
+      const itemToDelete = cartItems.find(item => getUID(item) === buttonEl.getAttribute("data-id") + buttonEl.getAttribute("data-color"));
       const newItems = cartItems.filter(item => getUID(item) !== getUID(itemToDelete));
 
       console.log(newItems);
@@ -120,7 +153,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       // reset local storage with updated values
       localStorage.removeItem("cartItems");
       localStorage.setItem("cartItems", JSON.stringify(newItems));
-    
+
       // delete deleted item from the DOM
       document.getElementById(getUID(itemToDelete)).remove();
 
@@ -131,22 +164,5 @@ window.addEventListener('DOMContentLoaded', (event) => {
       document.getElementById("totalQuantity").innerText = newItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
     })
   })
-
-  // query all the input for quantity displayed dynamicly by the previous function
-  const inputsQuantity = document.querySelectorAll(".itemQuantity");
-
-  // loop in the NodeList to get a specific input when is value is change by the user
-  inputsQuantity.forEach((input)=> {
-    input.addEventListener("change", e => {
-
-      //we get the cart items that may have been previously saved bu the user
-      const cartItems = getItemsFromLocalStorage("cartItems")
-
-      const inputEl = e.target;
-
-      // find the product in items that equal to the data-id attr of the input
-      const itemToUpdateQuantity = cartItems.find(item => getUID(item) === inputEl.getAttribute("data-id")+inputEl.getAttribute("data-color"));
-      const newItems = cartItems.filter(item => getUID(item) !== getUID(itemToUpdateQuantity));
-    })
-  })
+  updateQuantityitem()
 });
