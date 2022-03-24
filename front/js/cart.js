@@ -21,7 +21,7 @@ const displayItems = (items) => {
         </div>
         <div class="cart__item__content__settings">
           <div class="cart__item__content__settings__quantity">
-            <p>Qté : ${item.quantity} </p>
+            <p id="uquantity-${item.product._id}">Qté : ${item.quantity} </p>
             <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${item.quantity}" data-id="${item.product._id}" data-color="${item.color}">
           </div>
           <div class="cart__item__content__settings__delete">
@@ -31,35 +31,10 @@ const displayItems = (items) => {
       </div>
     </article>`;
 
-    insertStringInDOM("cart__items", "innerHTML", true, itemToDisplay)
+    insertStringInDOM("cart__items", "innerHTML", true, itemToDisplay);
+
   });
-}
-
-// function that will change the quantity of product
-// const editQuantity = async (displayItems) => {
-
-//   // waiting for the items display
-//   await displayItems
-
-//   // query all the inputs 
-//   const inputsQuantity = document.querySelectorAll(".itemQuantity")
-//   console.log(inputsQuantity)
-
-//   // loop in the NodeList to get a specific input  and listen is onchange event
-//   inputsQuantity.forEach((input) => {
-//     input.addEventListener("change" ,() => {
-
-//       // compare if data are equals
-
-//       for(i=[0]; i<cartItems.lenght; i++) {
-//         if(cartItems[i].product._id == input.dataset.id && cartItems[i].color == input.dataset.color) {
-//           return console.log(input.value)
-//         }
-//       }
-//     })
-//   })
-// }
-
+};
 
 
 // get all the prices values and multiply them with quantities to had a total price
@@ -81,7 +56,8 @@ const priceItemsSum = (items) => {
     });
   return itemsTotalPrice;
    */
-}
+};
+
 // function that will update the chosen item quantity and re display items on the dom
 function updateQuantityitem() {
   // query all the input for quantity displayed dynamicly by the previous function
@@ -92,27 +68,25 @@ function updateQuantityitem() {
     input.addEventListener("change", e => {
 
       //we get the cart items that may have been previously saved bu the user
-      const cartItems = getItemsFromLocalStorage("cartItems")
+      let cartItems = getItemsFromLocalStorage("cartItems");
 
       const inputEl = e.target;
 
-      // find the product in items that equal to the data-id attr of the input
-      let cartItemHasBeenPreviouslySaved = false;
       cartItems.forEach(item => {
         // we compare generated cart item ID's to determine if previously saved
         if (getUID(item) === inputEl.getAttribute("data-id") + inputEl.getAttribute("data-color")) {
           console.log(item);
           // if we enter the condition then we can update the item quantity with the one that is being added by the user
           item.quantity = parseInt(inputEl.value);
-          // we now know that the added cart item has been previously saved
-          cartItemHasBeenPreviouslySaved = true;
+          document.getElementById(`uquantity-${item.product._id}`).innerText = "Qté : " + item.quantity;
         }
-        console.log(item);
       });
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
-      displayItems(cartItems)
-    })
-  })
+      cartItems = getItemsFromLocalStorage("cartItems");
+      document.getElementById("totalPrice").innerText = priceItemsSum(cartItems).map(item => item.price).reduce((prev, curr) => prev + curr, 0);
+      document.getElementById("totalQuantity").innerText = cartItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
+    });
+  });
   
 }
 
@@ -163,6 +137,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
       document.getElementById("totalQuantity").innerText = newItems.map(item => item.quantity).reduce((prev, curr) => prev + curr, 0);
     })
-  })
-  updateQuantityitem()
+  });
+
+  // this function will register event listeners for update quantity button on each item
+  updateQuantityitem();
 });
