@@ -38,15 +38,20 @@ const fetchResources = async(resourceName) => {
 
 /**
  * 
+ * TODO make this more generic
+ * 
  * @param {object} data data get from form and local storage to send to the API
  * @returns {object}
  */
-const sendResource = async(contactData, productData) => {
+const sendResource = async (contactData, productData) => {
     let obj =[]
     try {
-        const APIResponse = await fetch("http://localhost:3000/api/order", {
+        const APIResponse = await fetch("http://localhost:3000/api/products/order", {
             method:"POST",
-            body:JSON.stringify(`${contactData, productData}`)
+            body:JSON.stringify({
+                contact: contactData,
+                products: productData
+            })
         })
         obj = await APIResponse.json();
     }catch (err){
@@ -54,4 +59,4 @@ const sendResource = async(contactData, productData) => {
         console.log(err)
     }
     return obj;
-}
+};
