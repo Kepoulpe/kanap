@@ -34,3 +34,24 @@ const fetchResources = async(resourceName) => {
     }
     return objList;
 };
+
+
+/**
+ * 
+ * @param {object} data data get from form and local storage to send to the API
+ * @returns {object}
+ */
+const sendResource = async(contactData, productData) => {
+    let obj =[]
+    try {
+        const APIResponse = await fetch("http://localhost:3000/api/order", {
+            method:"POST",
+            body:JSON.stringify(`${contactData, productData}`)
+        })
+        obj = await APIResponse.json();
+    }catch (err){
+        window.alert("Une erreur est survenue merci de réessayer ultérieurement")
+        console.log(err)
+    }
+    return obj;
+}
