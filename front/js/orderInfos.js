@@ -9,11 +9,11 @@ function validateInputsForm(e, inputs) {
     let validateInputs = true;
     inputs.forEach(input => {
         if (input.value == undefined || input.value.trim().length == 0) {
-            document.getElementById(input.errId+"ErrorMsg").innerText = "Merci de renseigner "+input.fieldName;
+            document.getElementById(input.errId + "ErrorMsg").innerText = "Merci de renseigner " + input.fieldName;
             validateInputs = false;
         } else if (!input.regex.test(input.value)) {
             console.log(input);
-            document.getElementById(input.errId+"ErrorMsg").innerText = "Merci de renseigner "+input.fieldName+" valide";
+            document.getElementById(input.errId + "ErrorMsg").innerText = "Merci de renseigner " + input.fieldName + " valide";
             validateInputs = false;
         }
     });
@@ -21,12 +21,17 @@ function validateInputsForm(e, inputs) {
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
+    const canSubmit = getItemsFromLocalStorage("cartItems")
+    if (canSubmit.length == 0) {
+        document.getElementById("order").disabled = true;
+    } else document.getElementById("order").disabled = false;
 
+    
     // 1) listen to submit even on form
     document.querySelector('form').addEventListener('submit', async (e) => {
 
         // TODO turn this into an array of product id's
-        const product = getItemsFromLocalStorage("cartItems");
+
 
         const inputFirstName = document.getElementById("firstName");
         const inputLastName = document.getElementById("lastName");
@@ -36,11 +41,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         // getting all inputs values and creating objects for validation
         const inputs = [
-            {input: inputFirstName, fieldName: "un prénom", errId: "firstName", regex: re},
-            {input: inputLastName, fieldName: "un nom", errId: "lastName", regex: re},
-            {input: inputAddress, fieldName: "une adresse", errId: "address", regex: reAddress},
-            {input:  inputCity, fieldName: "une ville", errId: "city", regex: re},
-            {input: inputEmail, fieldName: "une adresse email", errId: "email", regex: reEmail},
+            { input: inputFirstName, fieldName: "un prénom", errId: "firstName", regex: re },
+            { input: inputLastName, fieldName: "un nom", errId: "lastName", regex: re },
+            { input: inputAddress, fieldName: "une adresse", errId: "address", regex: reAddress },
+            { input: inputCity, fieldName: "une ville", errId: "city", regex: re },
+            { input: inputEmail, fieldName: "une adresse email", errId: "email", regex: reEmail },
         ];
 
         // 2) getting all the inputs values
@@ -51,18 +56,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
         const isValidated = validateInputsForm(e, inputs);
 
         if (!isValidated) {
-            const contactObject = {
+            const contactData = {
                 firstName: inputFirstName.value,
                 lastName: inputLastName.value,
                 address: inputAddress.value,
                 city: inputCity.value,
                 email: inputEmail.value,
             }
+            
+            // making the API call with the data and get back an order ID
+            // sendResource(contactData, productData)
+          
+            
             // TODO send the expected payload to the API (contact obj + products array of id's)
             // 3 - b) all values are valid
             // createNewObjectForBackend(e);
-            // send the form payload to the API
-            const sendPayloadToTheAPI = await sendResource(contactObject, product, "orderID");
+            // // send the form payload to the API
+            // const sendPayloadToTheAPI = await sendResource(contactData, productData, "orderID");
             // TODO rest of the logic
             // 3 - b - a) API sends back an error response
             // display error message
@@ -74,3 +84,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     });
 })
+
+
+// TODO issue with the fetch bad request maybe the body format is not apropriate had to find how to consstruct him to send the data to the API
+const products = getItemsFromLocalStorage("cartItems");
+            console.log(products)
+            let productData = []
+            products.forEach(product => {
+                productData.push(product.product._id)
+            })
+            console.log(productData)
