@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         document.getElementById("order").disabled = true;
     } else document.getElementById("order").disabled = false;
 
-    
+
     // 1) listen to submit even on form
     document.querySelector('form').addEventListener('submit', async (e) => {
 
@@ -63,16 +63,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 city: inputCity.value,
                 email: inputEmail.value,
             }
-            
-            // making the API call with the data and get back an order ID
-            // sendResource(contactData, productData)
-          
-            
+
+            // TODO issue with the fetch bad request maybe the body format is not apropriate had to find how to consstruct him to send the data to the API
+            const products = getItemsFromLocalStorage("cartItems");
+            console.log(products)
+            let productData = []
+            products.forEach(product => {
+                productData.push(product.product._id)
+            })
+            console.log(productData)
+
+
             // TODO send the expected payload to the API (contact obj + products array of id's)
             // 3 - b) all values are valid
             // createNewObjectForBackend(e);
-            // // send the form payload to the API
-            // const sendPayloadToTheAPI = await sendResource(contactData, productData, "orderID");
+            // send the form payload to the API
+            const sendPayloadToTheAPI = await sendResource(contactData, productData, "orderID");
             // TODO rest of the logic
             // 3 - b - a) API sends back an error response
             // display error message
@@ -86,11 +92,4 @@ window.addEventListener('DOMContentLoaded', (event) => {
 })
 
 
-// TODO issue with the fetch bad request maybe the body format is not apropriate had to find how to consstruct him to send the data to the API
-const products = getItemsFromLocalStorage("cartItems");
-            console.log(products)
-            let productData = []
-            products.forEach(product => {
-                productData.push(product.product._id)
-            })
-            console.log(productData)
+
