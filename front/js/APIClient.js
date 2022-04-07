@@ -48,9 +48,12 @@ const sendResource = async (contactData, productData) => {
     try {
         const APIResponse = await fetch("http://localhost:3000/api/products/order", {
             method:"POST",
+            headers: {
+                'Content-Type':'application/json'
+            },
             body:JSON.stringify({
-                contact: JSON.stringify(contactData),
-                products: JSON.stringify(productData)
+                contact: contactData,
+                products: productData
             })
         })
         obj = await APIResponse.json();
