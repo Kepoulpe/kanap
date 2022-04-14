@@ -63,14 +63,19 @@ window.addEventListener('load', (event) => {
                 address: inputAddress.value,
                 city: inputCity.value,
                 email: inputEmail.value,
-            }
+            };
 
             const products = getItemsFromLocalStorage("cartItems");
             let productData = []
             products.forEach(product => {
                 productData.push(product.product._id)
-            })
+            });
 
+            const data = {
+                contact: contactData,
+                products: productData
+            };
+            const endUrl = "products/order"
             //send the form payload to the API
             sendResource(contactData, productData, "orderID").then(res => {
                 // clean the local storage if the redirect have been done 

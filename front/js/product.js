@@ -72,12 +72,15 @@ function persistCartItem(addedCartItem) {
 // we wait that all resources are loaded (including scripts) before proceeding
 window.addEventListener('load', async () => {
     
+    
     // we fetch a product object with its ID obtained from the current URL
     const productObj = await fetchOneResource(getProductIdFromUrl(), "products");
 
     // once we get that product we display it
     displayProduct(productObj);
-
+    
+    //set the title page dynamic
+    document.title = productObj.name;
     // we get the add to cart button
     const addToCartBtn = document.getElementById("addToCart");
 
