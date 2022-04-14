@@ -13,10 +13,10 @@ function validate(inputs) {
             document.getElementById(input.id + "ErrorMsg").innerText = "Merci de renseigner " + input.fieldName;
             validateInputs = false;
         } else if (
-            document.getElementById(input.id).value.match(input.regex) == null 
+            document.getElementById(input.id).value.match(input.regex) == null
             || document.getElementById(input.id).value.match(input.regex).length <= 0
         ) {
-            document.getElementById(input.id + "ErrorMsg").innerText ="Merci de renseigner "+ input.fieldName + " valide";
+            document.getElementById(input.id + "ErrorMsg").innerText = "Merci de renseigner " + input.fieldName + " valide";
             validateInputs = false;
         }
     });
@@ -77,13 +77,16 @@ window.addEventListener('load', (event) => {
             };
             const endUrl = "products/order"
             //send the form payload to the API
-            sendResource(contactData, productData, "orderID").then(res => {
+            sendResource(endUrl, data).then(res => {
                 // clean the local storage if the redirect have been done 
                 localStorage.removeItem("cartItems");
                 // redirect the user to the confirmation page with the correct order number
                 location.href = `./confirmation.html?order-id=${res.orderId}`;
-            });
-        } 
+            }).catch(err => {
+                console.log(err)
+            })
+
+        }
 
     });
 })

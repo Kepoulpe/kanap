@@ -5,7 +5,7 @@
  */
  const fetchOneResource = async(id, resourceName) => {
     // declare an empty object
-    let obj = [];
+    let obj = {};
     try {
         // make the API call
         const APIResponse = await fetch(`http://localhost:3000/api/${resourceName}/${id}`, {
@@ -25,7 +25,7 @@
  * @returns {Object[]}
  */
 const fetchResources = async(resourceName) => {
-    let objList = [];
+    let objList = {};
     try {
         const APIResponse = await fetch(`http://localhost:3000/api/${resourceName}`);
         objList = await APIResponse.json();
@@ -43,24 +43,21 @@ const fetchResources = async(resourceName) => {
  * @param {object}  data data get from form and local storage to send to the API
  * @returns {object}
  */
- const sendResource = async (contactData, productData) => {
-    let obj =[]
+ const sendResource = async (endUrl, data) => {
+
     try {
-        const APIResponse = await fetch("http://localhost:3000/api/products/order", {
+        const APIResponse = await fetch(`http://localhost:3000/api/${endUrl}`, {
             method:"POST",
             headers: {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({
-                contact: contactData,
-                products: productData
-            })
+            body:JSON.stringify(data)
         })
-        obj = await APIResponse.json();
+        const obj = await APIResponse.json();
+        return obj;
     }catch (err){
         window.alert("Une erreur est survenue merci de réessayer ultérieurement")
-        e.preventDefault();
-        console.log(err)
+        return {};
     }
-    return obj;
+    
 };
